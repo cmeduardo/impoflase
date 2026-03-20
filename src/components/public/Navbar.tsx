@@ -11,7 +11,8 @@ const navLinks = [
   { href: "/contacto", label: "Contacto" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ whatsapp }: { whatsapp?: string | null }) {
+  const cleanPhone = (whatsapp ?? "50200000000").replace(/\D/g, "");
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -62,7 +63,7 @@ export default function Navbar() {
               </Link>
             ))}
             <Link
-              href="https://wa.me/50200000000"
+              href={`https://wa.me/${cleanPhone}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-nav"
@@ -122,7 +123,7 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="https://wa.me/50200000000"
+            href={`https://wa.me/${cleanPhone}`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-nav mt-2 justify-center"

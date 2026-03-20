@@ -8,7 +8,7 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <>
-      <Navbar />
+      <Navbar whatsapp={company?.whatsapp_number} />
       <main className="pt-16 lg:pt-20">{children}</main>
       <Footer company={company} />
       <WhatsAppButton phone={company?.whatsapp_number} />
