@@ -1,8 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
+import { CompanyInfo } from "@/types/database";
 
-export default function Footer() {
+export default function Footer({ company }: { company: CompanyInfo | null }) {
   const currentYear = new Date().getFullYear();
+
+  const phone = company?.phone_numbers?.[0] ?? "+502 0000-0000";
+  const email = company?.email ?? "info@importadoraflase.com";
+  const address = company?.address ?? "Guatemala, Guatemala";
+  const facebookUrl = company?.facebook_url ?? "https://facebook.com";
+  const instagramUrl = company?.instagram_url ?? "https://instagram.com";
+  const tiktokUrl = company?.tiktok_url ?? "https://tiktok.com";
+
+  const businessHours = company?.business_hours ?? {
+    "Lunes – Viernes": "8:00 – 18:00",
+    Sábado: "8:00 – 14:00",
+    Domingo: "Cerrado",
+  };
 
   return (
     <footer className="bg-flase-navy-deep text-white">
@@ -26,7 +40,7 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex gap-3 mt-6">
               <a
-                href="https://facebook.com"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 border border-white/20 flex items-center justify-center hover:border-flase-red hover:bg-flase-red transition-all duration-200"
@@ -37,7 +51,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://instagram.com"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 border border-white/20 flex items-center justify-center hover:border-flase-red hover:bg-flase-red transition-all duration-200"
@@ -48,7 +62,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://tiktok.com"
+                href={tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 border border-white/20 flex items-center justify-center hover:border-flase-red hover:bg-flase-red transition-all duration-200"
@@ -99,20 +113,20 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-white/60 text-sm">Guatemala, Guatemala</span>
+                <span className="text-white/60 text-sm">{address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-4 h-4 text-flase-red flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <span className="text-white/60 text-sm">+502 0000-0000</span>
+                <span className="text-white/60 text-sm">{phone}</span>
               </li>
               <li className="flex items-center gap-3">
                 <svg className="w-4 h-4 text-flase-red flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:info@importadoraflase.com" className="text-white/60 hover:text-flase-red text-sm transition-colors">
-                  info@importadoraflase.com
+                <a href={`mailto:${email}`} className="text-white/60 hover:text-flase-red text-sm transition-colors">
+                  {email}
                 </a>
               </li>
             </ul>
@@ -124,15 +138,11 @@ export default function Footer() {
               Horarios
             </h3>
             <ul className="space-y-2">
-              {[
-                { day: "Lunes – Viernes", hours: "8:00 – 18:00" },
-                { day: "Sábado", hours: "8:00 – 14:00" },
-                { day: "Domingo", hours: "Cerrado" },
-              ].map((item) => (
-                <li key={item.day} className="flex justify-between gap-4 text-sm">
-                  <span className="text-white/60">{item.day}</span>
-                  <span className={item.hours === "Cerrado" ? "text-flase-red" : "text-white"}>
-                    {item.hours}
+              {Object.entries(businessHours).map(([day, hours]) => (
+                <li key={day} className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/60">{day}</span>
+                  <span className={hours === "Cerrado" ? "text-flase-red" : "text-white"}>
+                    {hours}
                   </span>
                 </li>
               ))}

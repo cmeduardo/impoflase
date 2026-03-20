@@ -1,9 +1,10 @@
 "use client";
 
-export default function WhatsAppButton({ phone = "50200000000" }: { phone?: string }) {
+export default function WhatsAppButton({ phone }: { phone?: string | null }) {
+  const cleanPhone = (phone ?? "50200000000").replace(/\D/g, "");
   return (
     <a
-      href={`https://wa.me/${phone}?text=${encodeURIComponent("Hola, me gustaría obtener información sobre sus vehículos.")}`}
+      href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent("Hola, me gustaría obtener información sobre sus vehículos.")}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] hover:bg-[#20B954] shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 rounded-full"

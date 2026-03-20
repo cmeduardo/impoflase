@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { getCompanyInfo } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Sobre Nosotros",
   description: "Conocé la historia y valores de Importadora FLASE.",
 };
 
-export default function NosotrosPage() {
+export default async function NosotrosPage() {
+  const company = await getCompanyInfo();
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -35,15 +37,23 @@ export default function NosotrosPage() {
                 Nuestra Historia
               </h2>
               <div className="space-y-4 text-flase-gray leading-relaxed">
-                <p>
-                  Importadora FLASE nació con una visión clara: brindar acceso a vehículos de alta calidad importados directamente desde Estados Unidos, Japón y Corea, a precios justos y con total transparencia.
-                </p>
-                <p>
-                  Con más de 5 años de experiencia en el mercado guatemalteco, hemos construido una reputación sólida basada en la confianza, la honestidad y el compromiso con nuestros clientes.
-                </p>
-                <p>
-                  Cada vehículo en nuestro catálogo pasa por un riguroso proceso de selección e inspección antes de ser importado, garantizando que llegue en las mejores condiciones posibles.
-                </p>
+                {company?.about_text ? (
+                  company.about_text.split("\n").filter(Boolean).map((paragraph, i) => (
+                    <p key={i}>{paragraph}</p>
+                  ))
+                ) : (
+                  <>
+                    <p>
+                      Importadora FLASE nació con una visión clara: brindar acceso a vehículos de alta calidad importados directamente desde Estados Unidos, Japón y Corea, a precios justos y con total transparencia.
+                    </p>
+                    <p>
+                      Con más de 5 años de experiencia en el mercado guatemalteco, hemos construido una reputación sólida basada en la confianza, la honestidad y el compromiso con nuestros clientes.
+                    </p>
+                    <p>
+                      Cada vehículo en nuestro catálogo pasa por un riguroso proceso de selección e inspección antes de ser importado, garantizando que llegue en las mejores condiciones posibles.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
