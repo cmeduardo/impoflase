@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: #FFFFFF;
+  color: #1B1B2F;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-flase-red hover:bg-flase-red-hover text-white font-heading font-700 uppercase tracking-wider px-6 py-3 transition-all duration-200 inline-flex items-center gap-2;
+  }
+
+  .btn-outline {
+    @apply border-2 border-flase-red text-flase-red hover:bg-flase-red hover:text-white font-heading font-600 uppercase tracking-wider px-6 py-3 transition-all duration-200 inline-flex items-center gap-2;
+  }
+
+  .btn-nav {
+    @apply bg-flase-red hover:bg-flase-red-hover text-white font-heading text-sm font-700 uppercase tracking-wider px-5 py-2.5 transition-all duration-200;
+  }
+
+  .section-title {
+    @apply font-heading font-800 uppercase text-flase-navy;
+  }
+
+  .card-vehicle {
+    @apply bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .status-badge {
+    @apply text-xs font-heading font-700 uppercase tracking-wider px-3 py-1;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  .red-bar {
+    @apply w-12 h-1 bg-flase-red mb-4;
+  }
+
+  .admin-card {
+    @apply bg-[#1E1E35] border border-white/5 p-6 rounded-none;
+  }
+
+  .form-input {
+    @apply w-full border border-flase-gray-light text-flase-navy px-4 py-3 text-sm focus:outline-none focus:border-flase-navy transition-colors bg-white placeholder:text-flase-gray;
+  }
+
+  .admin-input {
+    @apply bg-[#12121F] border border-white/10 text-white text-sm px-3 py-2.5 focus:outline-none focus:border-flase-red transition-colors placeholder:text-white/20;
+  }
+}
+
+@layer utilities {
+  .font-700 { font-weight: 700; }
+  .font-800 { font-weight: 800; }
+  .font-600 { font-weight: 600; }
+  .text-balance { text-wrap: balance; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #1B1B2F;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #E63946;
+}
+
+/* Admin scrollbar */
+.admin-scroll::-webkit-scrollbar-track {
+  background: #12121F;
+}
+.admin-scroll::-webkit-scrollbar-thumb {
+  background: #2A2A45;
+}
