@@ -1,29 +1,33 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useTransition } from "react";
+import { useCallback, useTransition, useState, useEffect } from "react";
 
-const BODY_TYPES = ["SUV", "Sedán", "Pickup", "Hatchback", "Van", "Camioneta", "Coupé"];
-const FUEL_TYPES = ["Gasolina", "Diésel", "Híbrido", "Eléctrico"];
-const TRANSMISSIONS = ["Automática", "Manual", "CVT"];
 const STATUSES = [
   { value: "available", label: "Disponible" },
   { value: "in_transit", label: "Próximo Ingreso" },
   { value: "reserved", label: "Reservado" },
   { value: "sold", label: "Vendido" },
 ];
-const YEARS = Array.from({ length: 15 }, (_, i) => 2024 - i);
 
-interface FilterOption {
-  label: string;
-  options: string[];
-  param: string;
+interface FilterOptions {
+  bodyTypes: string[];
+  fuelTypes: string[];
+  transmissions: string[];
+  years: number[];
 }
 
-export default function VehicleFilters() {
+export default function VehicleFilters({ filterOptions }: { filterOptions: FilterOptions }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+
+  const [priceInput, setPriceInput] = useState(searchParams.get("max_price") || "");
+
+  // Keep price input in sync if user navigates back/forward
+  useEffect(() => {
+    setPriceInput(searchParams.get("max_price") || "");
+  }, [searchParams]);
 
   const updateFilter = useCallback(
     (key: string, value: string) => {
@@ -41,7 +45,13 @@ export default function VehicleFilters() {
     [router, searchParams]
   );
 
+  const applyPrice = () => {
+    const trimmed = priceInput.trim();
+    updateFilter("max_price", trimmed);
+  };
+
   const clearAll = () => {
+    setPriceInput("");
     startTransition(() => {
       router.push("/vehiculos");
     });
@@ -99,75 +109,94 @@ export default function VehicleFilters() {
       </FilterSection>
 
       {/* Body type */}
-      <FilterSection title="Carrocería">
-        <select
-          value={searchParams.get("body_type") || ""}
-          onChange={(e) => updateFilter("body_type", e.target.value)}
-          className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
-        >
-          <option value="">Todos</option>
-          {BODY_TYPES.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </FilterSection>
+      {filterOptions.bodyTypes.length > 0 && (
+        <FilterSection title="Carrocería">
+          <select
+            value={searchParams.get("body_type") || ""}
+            onChange={(e) => updateFilter("body_type", e.target.value)}
+            className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
+          >
+            <option value="">Todos</option>
+            {filterOptions.bodyTypes.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </FilterSection>
+      )}
 
       {/* Fuel */}
-      <FilterSection title="Combustible">
-        <select
-          value={searchParams.get("fuel_type") || ""}
-          onChange={(e) => updateFilter("fuel_type", e.target.value)}
-          className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
-        >
-          <option value="">Todos</option>
-          {FUEL_TYPES.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </FilterSection>
+      {filterOptions.fuelTypes.length > 0 && (
+        <FilterSection title="Combustible">
+          <select
+            value={searchParams.get("fuel_type") || ""}
+            onChange={(e) => updateFilter("fuel_type", e.target.value)}
+            className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
+          >
+            <option value="">Todos</option>
+            {filterOptions.fuelTypes.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </FilterSection>
+      )}
 
       {/* Transmission */}
-      <FilterSection title="Transmisión">
-        <select
-          value={searchParams.get("transmission") || ""}
-          onChange={(e) => updateFilter("transmission", e.target.value)}
-          className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
-        >
-          <option value="">Todas</option>
-          {TRANSMISSIONS.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </FilterSection>
+      {filterOptions.transmissions.length > 0 && (
+        <FilterSection title="Transmisión">
+          <select
+            value={searchParams.get("transmission") || ""}
+            onChange={(e) => updateFilter("transmission", e.target.value)}
+            className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
+          >
+            <option value="">Todas</option>
+            {filterOptions.transmissions.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </FilterSection>
+      )}
 
       {/* Year */}
-      <FilterSection title="Año">
-        <select
-          value={searchParams.get("year") || ""}
-          onChange={(e) => updateFilter("year", e.target.value)}
-          className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
-        >
-          <option value="">Todos</option>
-          {YEARS.map((y) => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
-      </FilterSection>
+      {filterOptions.years.length > 0 && (
+        <FilterSection title="Año">
+          <select
+            value={searchParams.get("year") || ""}
+            onChange={(e) => updateFilter("year", e.target.value)}
+            className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
+          >
+            <option value="">Todos</option>
+            {filterOptions.years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </FilterSection>
+      )}
 
-      {/* Price range GTQ */}
+      {/* Price max — free input */}
       <FilterSection title="Precio Máximo (GTQ)">
-        <select
-          value={searchParams.get("max_price") || ""}
-          onChange={(e) => updateFilter("max_price", e.target.value)}
-          className="w-full border border-flase-gray-light text-sm p-2 text-flase-navy focus:outline-none focus:border-flase-navy"
-        >
-          <option value="">Sin límite</option>
-          <option value="40000">Q40,000</option>
-          <option value="60000">Q60,000</option>
-          <option value="80000">Q80,000</option>
-          <option value="100000">Q100,000</option>
-          <option value="150000">Q150,000</option>
-        </select>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            min={0}
+            step={1000}
+            placeholder="Ej: 150000"
+            value={priceInput}
+            onChange={(e) => setPriceInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyPrice()}
+            className="w-full border border-flase-gray-light text-sm px-2 py-2 text-flase-navy focus:outline-none focus:border-flase-navy placeholder:text-flase-gray/50"
+          />
+          <button
+            onClick={applyPrice}
+            className="bg-flase-navy text-white text-xs font-heading font-700 uppercase px-3 hover:bg-flase-navy/80 transition-colors flex-shrink-0"
+          >
+            OK
+          </button>
+        </div>
+        {searchParams.get("max_price") && (
+          <p className="text-xs text-flase-gray mt-1">
+            Hasta Q{Number(searchParams.get("max_price")).toLocaleString("es-GT")}
+          </p>
+        )}
       </FilterSection>
     </aside>
   );

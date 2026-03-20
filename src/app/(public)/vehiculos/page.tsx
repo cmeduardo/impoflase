@@ -13,6 +13,31 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+interface FilterOptions {
+  bodyTypes: string[];
+  fuelTypes: string[];
+  transmissions: string[];
+  years: number[];
+}
+
+async function getFilterOptions(): Promise<FilterOptions> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicles")
+    .select("body_type, fuel_type, transmission, year");
+
+  if (!data) return { bodyTypes: [], fuelTypes: [], transmissions: [], years: [] };
+
+  const unique = <T,>(arr: T[]): T[] => Array.from(new Set(arr));
+
+  return {
+    bodyTypes: unique(data.map((v) => v.body_type).filter(Boolean) as string[]).sort(),
+    fuelTypes: unique(data.map((v) => v.fuel_type).filter(Boolean) as string[]).sort(),
+    transmissions: unique(data.map((v) => v.transmission).filter(Boolean) as string[]).sort(),
+    years: unique(data.map((v) => v.year).filter(Boolean) as number[]).sort((a, b) => b - a),
+  };
+}
+
 async function getVehicles(searchParams: Record<string, string>): Promise<{
   vehicles: Vehicle[];
   total: number;
@@ -63,7 +88,10 @@ export default async function VehiculosPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
-  const { vehicles, total } = await getVehicles(params);
+  const [{ vehicles, total }, filterOptions] = await Promise.all([
+    getVehicles(params),
+    getFilterOptions(),
+  ]);
   const page = parseInt(params.page || "1");
   const totalPages = Math.ceil(total / 12);
 
@@ -87,7 +115,7 @@ export default async function VehiculosPage({
           {/* Filters sidebar */}
           <div className="w-full lg:w-64 flex-shrink-0">
             <Suspense fallback={<div className="h-64 bg-white animate-pulse" />}>
-              <VehicleFilters />
+              <VehicleFilters filterOptions={filterOptions} />
             </Suspense>
           </div>
 
