@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
@@ -15,8 +15,8 @@ interface VehicleFormData {
   brand: string;
   model: string;
   year: number;
-  price_usd: number;
-  price_gtq: number | null;
+  price_gtq: number;
+  price_usd: number | null;
   origin_country: string;
   status: string;
   body_type: string;
@@ -82,8 +82,8 @@ export default function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
       brand: vehicle?.brand || "",
       model: vehicle?.model || "",
       year: vehicle?.year || new Date().getFullYear(),
-      price_usd: vehicle?.price_usd || 0,
-      price_gtq: vehicle?.price_gtq || null,
+      price_gtq: vehicle?.price_gtq || 0,
+      price_usd: vehicle?.price_usd || null,
       origin_country: vehicle?.origin_country || "",
       status: vehicle?.status || "available",
       body_type: vehicle?.body_type || "",
@@ -176,8 +176,8 @@ export default function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
       brand: data.brand,
       model: data.model,
       year: Number(data.year),
-      price_usd: Number(data.price_usd),
-      price_gtq: data.price_gtq ? Number(data.price_gtq) : null,
+      price_gtq: Number(data.price_gtq),
+      price_usd: data.price_usd ? Number(data.price_usd) : 0,
       origin_country: data.origin_country,
       status: data.status,
       body_type: data.body_type,
@@ -264,20 +264,20 @@ export default function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
               placeholder="2023"
             />
           </AdminField>
-          <AdminField label="Precio USD *" error={errors.price_usd?.message}>
+          <AdminField label="Precio GTQ *" error={errors.price_gtq?.message}>
             <AdminInput
-              {...register("price_usd", { required: "Requerido", min: 0 })}
-              type="number"
-              step="0.01"
-              placeholder="12500"
-            />
-          </AdminField>
-          <AdminField label="Precio GTQ">
-            <AdminInput
-              {...register("price_gtq")}
+              {...register("price_gtq", { required: "Requerido", min: 0 })}
               type="number"
               step="0.01"
               placeholder="96250"
+            />
+          </AdminField>
+          <AdminField label="Precio USD (referencia)">
+            <AdminInput
+              {...register("price_usd")}
+              type="number"
+              step="0.01"
+              placeholder="12500"
             />
           </AdminField>
           <AdminField label="País de Origen *" error={errors.origin_country?.message}>
@@ -289,38 +289,38 @@ export default function VehicleForm({ vehicle }: { vehicle?: Vehicle }) {
       {/* Specs */}
       <FormSection title="Especificaciones">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <AdminField label="Carrocería *">
-            <AdminSelect {...register("body_type", { required: true })}>
+          <AdminField label="Carrocería *" error={errors.body_type?.message}>
+            <AdminSelect {...register("body_type", { required: "Requerido" })}>
               <option value="">Seleccionar</option>
               {BODY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </AdminSelect>
           </AdminField>
-          <AdminField label="Combustible *">
-            <AdminSelect {...register("fuel_type", { required: true })}>
+          <AdminField label="Combustible *" error={errors.fuel_type?.message}>
+            <AdminSelect {...register("fuel_type", { required: "Requerido" })}>
               <option value="">Seleccionar</option>
               {FUEL_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </AdminSelect>
           </AdminField>
-          <AdminField label="Transmisión *">
-            <AdminSelect {...register("transmission", { required: true })}>
+          <AdminField label="Transmisión *" error={errors.transmission?.message}>
+            <AdminSelect {...register("transmission", { required: "Requerido" })}>
               <option value="">Seleccionar</option>
               {TRANSMISSIONS.map((t) => <option key={t} value={t}>{t}</option>)}
             </AdminSelect>
           </AdminField>
-          <AdminField label="Kilometraje *">
-            <AdminInput {...register("mileage_km", { required: true })} type="number" placeholder="45000" />
+          <AdminField label="Kilometraje *" error={errors.mileage_km?.message}>
+            <AdminInput {...register("mileage_km", { required: "Requerido" })} type="number" placeholder="45000" />
           </AdminField>
           <AdminField label="Motor (cc)">
             <AdminInput {...register("engine_cc")} type="number" placeholder="2000" />
           </AdminField>
-          <AdminField label="Color *">
-            <AdminInput {...register("color", { required: true })} placeholder="Blanco" />
+          <AdminField label="Color *" error={errors.color?.message}>
+            <AdminInput {...register("color", { required: "Requerido" })} placeholder="Blanco" />
           </AdminField>
           <AdminField label="Tracción">
             <AdminInput {...register("drive_type")} placeholder="4x4, AWD..." />
           </AdminField>
-          <AdminField label="Estado *">
-            <AdminSelect {...register("status", { required: true })}>
+          <AdminField label="Estado *" error={errors.status?.message}>
+            <AdminSelect {...register("status", { required: "Requerido" })}>
               {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </AdminSelect>
           </AdminField>
@@ -474,22 +474,26 @@ function AdminField({ label, error, children }: { label: string; error?: string;
   );
 }
 
-function AdminInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
+const AdminInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+  (props, ref) => (
     <input
       {...props}
+      ref={ref}
       className={`w-full bg-[#12121F] border border-white/10 text-white text-sm px-3 py-2.5 focus:outline-none focus:border-flase-red transition-colors placeholder:text-white/20 ${props.className || ""}`}
     />
-  );
-}
+  )
+);
+AdminInput.displayName = "AdminInput";
 
-function AdminSelect({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
+const AdminSelect = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
+  ({ children, ...props }, ref) => (
     <select
       {...props}
+      ref={ref}
       className="w-full bg-[#12121F] border border-white/10 text-white text-sm px-3 py-2.5 focus:outline-none focus:border-flase-red transition-colors"
     >
       {children}
     </select>
-  );
-}
+  )
+);
+AdminSelect.displayName = "AdminSelect";
